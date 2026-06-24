@@ -8,7 +8,16 @@ use typst::foundations::{Dict, Value};
 
 use crate::model::{Config, PostMeta};
 use crate::world::Shared;
-use crate::{dates, feed, head, links, render, text, toc, Res};
+use crate::{code, dates, feed, head, links, render, text, toc, Res};
+
+/// A compiled post held until we know its neighbors: its HTML, metadata, and
+/// the post-level rendering options still needed at write time.
+struct Compiled {
+    html: String,
+    meta: PostMeta,
+    toc: toc::Toc,
+    line_numbers: bool,
+}
 
 /// Build the whole site rooted at `root` into `root/site`. With `strict`, a
 /// broken internal link fails the build (before publishing the new output).
@@ -70,8 +79,8 @@ fn compile_posts(
     config: &Config,
 ) -> Res<Vec<PostMeta>> {
     // Compile every post first — we need all dates before we know each post's
-    // neighbors for prev/next. Each entry is (html, metadata, toc-flag).
-    let mut compiled: Vec<(String, PostMeta, bool)> = Vec::new();
+    // neighbors for prev/next.
+    let mut compiled: Vec<Compiled> = Vec::new();
     for entry in fs::read_dir(root.join("posts"))? {
         let path = entry?.path();
         if path.extension().and_then(|e| e.to_str()) != Some("typ") {
@@ -89,34 +98,49 @@ fn compile_posts(
         if dates::parse(&fm.date).is_none() {
             eprintln!("⚠ {rel}: \"{}\" is not a valid date or timestamp", fm.date);
         }
-        let with_toc = fm.toc;
-        compiled.push((html, PostMeta::from_frontmatter(slug, fm), with_toc));
+        let toc = match (fm.toc, fm.collapsed) {
+            (false, _) => toc::Toc::Off,
+            (true, false) => toc::Toc::Open,
+            (true, true) => toc::Toc::Collapsed,
+        };
+        let line_numbers = fm.line_numbers;
+        compiled.push(Compiled {
+            html,
+            meta: PostMeta::from_frontmatter(slug, fm),
+            toc,
+            line_numbers,
+        });
     }
 
     // Newest first; unparseable dates sort last. Cached so each date parses once.
-    compiled.sort_by_cached_key(|(_, m, _)| std::cmp::Reverse(dates::parse(&m.date)));
+    compiled.sort_by_cached_key(|c| std::cmp::Reverse(dates::parse(&c.meta.date)));
 
     // Write each post with prev (older) / next (newer) navigation.
     for i in 0..compiled.len() {
-        let older = compiled.get(i + 1).map(|(_, m, _)| m);
+        let older = compiled.get(i + 1).map(|c| &c.meta);
         let newer = i
             .checked_sub(1)
             .and_then(|j| compiled.get(j))
-            .map(|(_, m, _)| m);
-        let (html, meta, with_toc) = &compiled[i];
-        let html = toc::process(html, *with_toc);
+            .map(|c| &c.meta);
+        let c = &compiled[i];
+        let html = toc::process(&c.html, c.toc);
+        let html = if c.line_numbers {
+            code::number_lines(&html)
+        } else {
+            html
+        };
         let html = inject_post_nav(&html, older, newer);
         write_html(
             staging,
-            &format!("posts/{}.html", meta.slug),
+            &format!("posts/{}.html", c.meta.slug),
             &html,
             config,
-            &meta.summary,
+            &c.meta.summary,
             true,
         )?;
     }
 
-    Ok(compiled.into_iter().map(|(_, m, _)| m).collect())
+    Ok(compiled.into_iter().map(|c| c.meta).collect())
 }
 
 /// Insert a prev (older) / next (newer) navigation block before `</main>`.

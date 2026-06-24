@@ -89,6 +89,14 @@
   }),
 )
 
+// Floating "back to top" link. `#top` is the spec's special top-of-document
+// fragment (no target element needed); CSS reveals it on scroll, zero JS.
+#let to-top() = html.elem(
+  "a",
+  attrs: (href: "#top", class: "to-top", "aria-label": "Back to top"),
+  [↑],
+)
+
 // Generic page shell (used by About and the generated index/tag pages).
 #let page(title: none, body) = {
   set document(title: if title == none { site.title } else { title + " — " + site.title })
@@ -96,6 +104,7 @@
   site-header()
   html.elem("main", attrs: (class: "container"), body)
   site-footer()
+  to-top()
 }
 
 // --- post --------------------------------------------------------------------
@@ -112,9 +121,26 @@
   },
 )
 
-#let post(title: "", date: "", tags: (), summary: "", toc: false, body) = {
+#let post(
+  title: "",
+  date: "",
+  tags: (),
+  summary: "",
+  toc: false,
+  collapsed: false,
+  line-numbers: false,
+  body,
+) = {
   // Frontmatter that papyr reads back via document introspection.
-  [#metadata((title: title, date: date, tags: tags, summary: summary, toc: toc)) <frontmatter>]
+  [#metadata((
+      title: title,
+      date: date,
+      tags: tags,
+      summary: summary,
+      toc: toc,
+      collapsed: collapsed,
+      line-numbers: line-numbers,
+    )) <frontmatter>]
 
   set document(title: title + " — " + site.title)
   show: with-code-theme
@@ -140,4 +166,5 @@
     ),
   )
   site-footer()
+  to-top()
 }

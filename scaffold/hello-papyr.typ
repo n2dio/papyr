@@ -5,6 +5,7 @@
   tags: ("intro",),
   summary: "Your first post — written in Typst, built by papyr.",
   toc: true,
+  line-numbers: true,
 )
 
 Welcome to your new blog. Posts are written in #link("https://typst.app")[Typst]

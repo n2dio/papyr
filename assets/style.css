@@ -61,7 +61,7 @@
   --code-bg: #0d1117;
   --code-fg: #c9d1d9;
   --code-label: #6e7681;
-  --max-width: 46rem;
+  --max-width: 52rem;
   --font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
@@ -346,6 +346,21 @@ pre code[data-lang]::before {
   color: var(--code-label);
 }
 
+/* line numbers (opt-in per post via `line-numbers: true`). Each line is wrapped
+   in a <span class="line"> at build time; CSS counters draw the gutter. */
+pre.numbered code { counter-reset: line; }
+pre.numbered .line { counter-increment: line; }
+pre.numbered .line::before {
+  content: counter(line);
+  display: inline-block;
+  min-width: 2ch;
+  margin-right: 1.25rem;
+  text-align: right;
+  color: var(--code-label);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 /* --- images & math -------------------------------------------------------- */
 img { max-width: 100%; height: auto; }
 math { font-size: 1.05em; }
@@ -399,9 +414,50 @@ th {
   .callout-warning { --callout-bg: #2a1e0a; }
 }
 
+/* --- back to top ---------------------------------------------------------- */
+/* Revealed on scroll via a scroll-driven animation — zero JS. Where scroll
+   timelines aren't supported the animation collapses to its end state, so the
+   button is simply always visible (a fine fallback). Hidden near the top so it
+   never appears on short pages. */
+.to-top {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--bg) 85%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 2px 14px rgb(0 0 0 / 0.12);
+  animation: to-top-reveal linear both;
+  animation-timeline: scroll(root block);
+  animation-range: 350px 650px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.to-top:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+@keyframes to-top-reveal {
+  from { opacity: 0; visibility: hidden; transform: translateY(0.5rem); }
+  to   { opacity: 1; visibility: visible; transform: none; }
+}
+
 /* --- reduced motion ------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  /* don't animate the reveal; keep the affordance available */
+  .to-top { animation: none; opacity: 1; visibility: visible; transform: none; }
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*) {
@@ -418,7 +474,8 @@ th {
     --accent: #000;
   }
   .site-header nav,
-  .site-footer { display: none; }
+  .site-footer,
+  .to-top { display: none; }
   .container,
   .site-header { max-width: none; }
   a { color: #000; text-decoration: underline; }

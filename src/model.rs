@@ -25,6 +25,12 @@ pub struct FrontMatter {
     /// Opt in to a table of contents (`toc: true` in the post).
     #[serde(default)]
     pub toc: bool,
+    /// When a TOC is shown, start it collapsed instead of expanded.
+    #[serde(default)]
+    pub collapsed: bool,
+    /// Number the lines of this post's code blocks.
+    #[serde(default, rename = "line-numbers")]
+    pub line_numbers: bool,
 }
 
 /// A post's metadata plus its slug; this is what we serialize to

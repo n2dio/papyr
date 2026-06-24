@@ -4,6 +4,7 @@
 //! `config.yaml`, content in `posts/` + `pages/`, and look in `lib/` + `assets/`.
 
 mod build;
+mod code;
 mod dates;
 mod feed;
 mod head;
