@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>name</key>
+  <string>n2d dark</string>
+  <key>settings</key>
+  <array>
+    <dict>
+      <key>settings</key>
+      <dict>
+        <key>background</key>
+        <string>#0d1117</string>
+        <key>foreground</key>
+        <string>#c9d1d9</string>
+      </dict>
+    </dict>
+    <dict>
+      <key>scope</key>
+      <string>comment, punctuation.definition.comment</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#8b949e</string></dict>
+    </dict>
+    <dict>
+      <key>scope</key>
+      <string>keyword, storage, storage.type, keyword.control, keyword.operator</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#ff7b72</string></dict>
+    </dict>
+    <dict>
+      <key>scope</key>
+      <string>string, string.quoted, punctuation.definition.string</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#a5d6ff</string></dict>
+    </dict>
+    <dict>
+      <key>scope</key>
+      <string>constant.numeric, constant.language, constant.character, constant.other</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#79c0ff</string></dict>
+    </dict>
+    <dict>
+      <key>scope</key>
+      <string>entity.name.function, support.function, meta.function-call</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#d2a8ff</string></dict>
+    </dict>
+    <dict>
+      <key>scope</key>
+      <string>entity.name.type, entity.name.class, support.type, support.class, entity.other.inherited-class</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#79c0ff</string></dict>
+    </dict>
+    <dict>
+      <key>scope</key>
+      <string>variable, variable.other, variable.parameter</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#ffa657</string></dict>
+    </dict>
+    <dict>
+      <key>scope</key>
+      <string>entity.name.tag, markup.heading</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#7ee787</string></dict>
+    </dict>
+    <dict>
+      <key>scope</key>
+      <string>entity.other.attribute-name, support.constant</string>
+      <key>settings</key>
+      <dict><key>foreground</key><string>#79c0ff</string></dict>
+    </dict>
+  </array>
+</dict>
+</plist>

@@ -1,0 +1,9 @@
+/site/
+/build/
+/target/
+/.scratch/
+/.direnv/
+.DS_Store
+
+# Claude Code machine-local settings
+/.claude/settings.local.json
