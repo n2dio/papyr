@@ -1,10 +1,11 @@
 //! The `serve` command: build, serve `site/` with axum, rebuild on change.
 
 use std::error::Error;
+use std::fs;
 use std::net::SocketAddr;
 use std::path::Path;
 use std::sync::mpsc;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 
 use axum::Router;
 use notify::{RecursiveMode, Watcher};
@@ -57,15 +58,55 @@ fn watch_loop(root: &Path) -> Res<()> {
         watcher.watch(&config, RecursiveMode::NonRecursive)?;
     }
 
+    // A rebuild writes into build/ and site/ (not watched), but on macOS that
+    // churn still surfaces as events here — so rebuilding on every event would
+    // loop forever. Gate on a real source-mtime change: events that don't
+    // correspond to an edited source (i.e. the build's own output) are ignored.
+    let mut last_built = SystemTime::now();
     loop {
         // Block until something changes, then debounce a short burst.
         let _ = rx.recv()?;
         std::thread::sleep(Duration::from_millis(200));
         while rx.try_recv().is_ok() {}
 
+        if latest_source_mtime(root) <= last_built {
+            continue; // no source actually changed — build churn, ignore it
+        }
+
+        // Stamp the time *before* building so an edit made mid-build is still
+        // seen as newer next time and isn't lost.
+        let started = SystemTime::now();
         println!("› change detected — rebuilding");
         if let Err(e) = build::build(root, false) {
             eprintln!("build error: {e}");
         }
+        last_built = started;
+        while rx.try_recv().is_ok() {} // drop the events the build just produced
     }
+}
+
+/// Newest mtime across all watched sources (files and their directories, so
+/// creates and removes register too). Lets the watcher tell a real edit apart
+/// from the filesystem noise the build's own output produces.
+fn latest_source_mtime(root: &Path) -> SystemTime {
+    fn visit(path: &Path, latest: &mut SystemTime) {
+        let Ok(meta) = fs::metadata(path) else { return };
+        if let Ok(m) = meta.modified() {
+            *latest = (*latest).max(m);
+        }
+        if meta.is_dir() {
+            if let Ok(entries) = fs::read_dir(path) {
+                for entry in entries.flatten() {
+                    visit(&entry.path(), latest);
+                }
+            }
+        }
+    }
+
+    let mut latest = SystemTime::UNIX_EPOCH;
+    for dir in ["posts", "pages", "lib", "gen", "assets"] {
+        visit(&root.join(dir), &mut latest);
+    }
+    visit(&root.join("config.yaml"), &mut latest);
+    latest
 }
