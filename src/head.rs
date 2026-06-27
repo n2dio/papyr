@@ -39,6 +39,9 @@ pub(crate) fn meta(
     };
     line(&format!(r#"<meta name="description" content="{d}">"#));
     line(&format!(r#"<link rel="canonical" href="{c}">"#));
+    for icon in &config.favicons {
+        line(icon);
+    }
     line(r##"<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fcfcfb">"##);
     line(r##"<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f0f12">"##);
     line(&format!(r#"<meta property="og:type" content="{og_type}">"#));
@@ -81,6 +84,7 @@ mod tests {
             title: "My \"Blog\"".into(),
             url: "https://example.com".into(),
             description: "desc".into(),
+            favicons: vec![r#"<link rel="icon" href="/favicon.svg">"#.into()],
         }
     }
 
@@ -112,6 +116,14 @@ mod tests {
         let out = meta(html, &cfg(), "https://example.com/", "d", true);
         assert!(out.contains(r#"og:title" content="Rust &amp; You &lt;ok&gt;""#));
         assert!(!out.contains("&amp;amp;"));
+    }
+
+    #[test]
+    fn injects_favicon_links_from_config() {
+        let html = "<head><title>T</title></head>";
+        let out = meta(html, &cfg(), "https://example.com/", "d", false);
+        assert!(out.contains(r#"<link rel="icon" href="/favicon.svg">"#));
+        assert!(out.find("favicon").unwrap() < out.find("</head>").unwrap());
     }
 
     #[test]

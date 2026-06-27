@@ -34,7 +34,8 @@ pub fn build(root: &Path, strict: bool) -> Res<()> {
     fs::create_dir_all(staging.join("posts"))?;
     fs::create_dir_all(staging.join("tags"))?;
 
-    let config = read_config(root)?;
+    let mut config = read_config(root)?;
+    config.favicons = favicon_links(root);
 
     println!("› compiling posts");
     let posts = compile_posts(&shared, root, &staging, &config)?;
@@ -329,14 +330,42 @@ fn write_robots(staging: &Path, config: &Config) -> Res<()> {
     Ok(())
 }
 
-/// Copy the stylesheet and fonts into the staging output.
+/// Favicon files copied verbatim to the site root (and linked in `<head>`)
+/// when present in `assets/`.
+const FAVICONS: &[&str] = &["favicon.svg", "favicon.ico", "apple-touch-icon.png"];
+
+/// Copy the stylesheet, fonts, and any favicons into the staging output.
 fn copy_assets(root: &Path, staging: &Path) -> Res<()> {
     fs::copy(root.join("assets/style.css"), staging.join("style.css"))?;
     let fonts = root.join("assets/fonts");
     if fonts.is_dir() {
         copy_dir(&fonts, &staging.join("fonts"))?;
     }
+    for icon in FAVICONS {
+        let src = root.join("assets").join(icon);
+        if src.is_file() {
+            fs::copy(&src, staging.join(icon))?;
+        }
+    }
     Ok(())
+}
+
+/// Build the `<head>` favicon `<link>` tags for whichever icons exist in
+/// `assets/`. An SVG (when present) is preferred by modern browsers; the
+/// `.ico` stays as the universal fallback.
+fn favicon_links(root: &Path) -> Vec<String> {
+    let assets = root.join("assets");
+    let mut links = Vec::new();
+    if assets.join("favicon.svg").is_file() {
+        links.push(r#"<link rel="icon" type="image/svg+xml" href="/favicon.svg">"#.to_string());
+    }
+    if assets.join("favicon.ico").is_file() {
+        links.push(r#"<link rel="icon" href="/favicon.ico" sizes="any">"#.to_string());
+    }
+    if assets.join("apple-touch-icon.png").is_file() {
+        links.push(r#"<link rel="apple-touch-icon" href="/apple-touch-icon.png">"#.to_string());
+    }
+    links
 }
 
 /// Read and parse `config.yaml`, with the path named in any error.

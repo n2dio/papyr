@@ -11,6 +11,10 @@ pub struct Config {
     pub url: String,
     #[serde(default)]
     pub description: String,
+    /// Pre-rendered `<link>` tags for whichever favicon files exist in
+    /// `assets/`. Populated by the build, not read from `config.yaml`.
+    #[serde(skip)]
+    pub favicons: Vec<String>,
 }
 
 /// A post's frontmatter, as written in the `metadata((...))` block.
