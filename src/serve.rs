@@ -210,7 +210,10 @@ mod tests {
     #[test]
     fn injects_before_closing_body() {
         let out = inject_livereload("<html><body>hi</body></html>");
-        assert_eq!(out, format!("<html><body>hi{LIVERELOAD_SCRIPT}</body></html>"));
+        assert_eq!(
+            out,
+            format!("<html><body>hi{LIVERELOAD_SCRIPT}</body></html>")
+        );
     }
 
     #[test]
@@ -223,6 +226,9 @@ mod tests {
     fn injects_before_last_body_when_multiple() {
         // Only the final </body> should be the insertion point.
         let out = inject_livereload("<body>a</body><body>b</body>");
-        assert_eq!(out, format!("<body>a</body><body>b{LIVERELOAD_SCRIPT}</body>"));
+        assert_eq!(
+            out,
+            format!("<body>a</body><body>b{LIVERELOAD_SCRIPT}</body>")
+        );
     }
 }
