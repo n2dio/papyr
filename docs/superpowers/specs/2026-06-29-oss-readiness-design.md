@@ -10,9 +10,10 @@ prebuilt binaries; complete licensing and crate metadata; and CI.
 
 Current state of the repo:
 
-- `Cargo.toml` declares `license = "MIT OR Apache-2.0"` but **no LICENSE files
-  exist**, and it lacks `repository`, `homepage`, `readme`, `authors`,
-  `keywords`, and `categories` — all expected by crates.io / docs.rs.
+- `Cargo.toml` declares `license = "MIT OR Apache-2.0"` but **no LICENSE file
+  exists**, and it lacks `repository`, `homepage`, `readme`, `authors`,
+  `keywords`, and `categories` — all expected by crates.io / docs.rs. The
+  license will be narrowed to **MIT only**.
 - Only `.github/workflows/release.yml` exists (builds binary tarballs on `v*`
   tags for linux-musl + macOS). There is **no test/lint CI**.
 - Nix support is a legacy `shell.nix` dev shell only — no `flake.nix`, so no
@@ -35,9 +36,10 @@ Current state of the repo:
 
 ### 1. Licensing
 
-- Add `LICENSE-MIT` and `LICENSE-APACHE` at the repo root (standard dual-license
-  text), copyright line `2026 Tim Eggert`.
-- README gains a short License section referencing both.
+- Add a single `LICENSE` file (standard MIT text) at the repo root, copyright
+  line `2026 Tim Eggert`.
+- Change `Cargo.toml` `license` from `"MIT OR Apache-2.0"` to `"MIT"`.
+- README License section reads `MIT` and points at `LICENSE`.
 
 ### 2. `Cargo.toml` metadata
 
