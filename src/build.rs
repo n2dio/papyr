@@ -8,7 +8,7 @@ use typst::foundations::{Dict, Value};
 
 use crate::model::{Config, PostMeta};
 use crate::world::Shared;
-use crate::{code, dates, feed, head, links, render, text, toc, Res};
+use crate::{Res, code, dates, feed, head, links, render, text, toc};
 
 /// A compiled post held until we know its neighbors: its HTML, metadata, and
 /// the post-level rendering options still needed at write time.

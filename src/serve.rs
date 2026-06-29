@@ -13,14 +13,14 @@ use std::path::Path;
 use std::sync::mpsc;
 use std::time::{Duration, SystemTime};
 
+use axum::Router;
 use axum::body::Body;
 use axum::extract::Request;
 use axum::http::header::{CONTENT_LENGTH, CONTENT_TYPE};
 use axum::middleware::{self, Next};
-use axum::response::sse::{Event, KeepAlive, Sse};
 use axum::response::Response;
+use axum::response::sse::{Event, KeepAlive, Sse};
 use axum::routing::get;
-use axum::Router;
 use notify::{RecursiveMode, Watcher};
 use tokio::sync::broadcast;
 use tokio_stream::wrappers::BroadcastStream;
@@ -28,7 +28,7 @@ use tokio_stream::{Stream, StreamExt};
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 
-use crate::{build, Res};
+use crate::{Res, build};
 
 /// Path the SSE live-reload endpoint is served from. The `__papyr` prefix
 /// won't collide with generated site content.
@@ -186,11 +186,11 @@ fn latest_source_mtime(root: &Path) -> SystemTime {
         if let Ok(m) = meta.modified() {
             *latest = (*latest).max(m);
         }
-        if meta.is_dir() {
-            if let Ok(entries) = fs::read_dir(path) {
-                for entry in entries.flatten() {
-                    visit(&entry.path(), latest);
-                }
+        if meta.is_dir()
+            && let Ok(entries) = fs::read_dir(path)
+        {
+            for entry in entries.flatten() {
+                visit(&entry.path(), latest);
             }
         }
     }
@@ -205,7 +205,7 @@ fn latest_source_mtime(root: &Path) -> SystemTime {
 
 #[cfg(test)]
 mod tests {
-    use super::{inject_livereload, LIVERELOAD_SCRIPT};
+    use super::{LIVERELOAD_SCRIPT, inject_livereload};
 
     #[test]
     fn injects_before_closing_body() {
