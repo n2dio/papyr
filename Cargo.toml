@@ -1,7 +1,7 @@
 [package]
 name = "papyr"
 version = "0.1.4"
-edition = "2021"
+edition = "2024"
 description = "A minimal, Typst-powered static blog generator"
 license = "MIT"
 authors = ["Tim Eggert <tim@n2d.io>"]

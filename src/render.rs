@@ -11,9 +11,9 @@ use typst_html::{HtmlDocument, HtmlOptions};
 use typst_kit::diagnostics::termcolor::{ColorChoice, StandardStream};
 use typst_kit::diagnostics::{self, DiagnosticFormat, DiagnosticWorld};
 
+use crate::Res;
 use crate::model::FrontMatter;
 use crate::world::{Shared, SiteWorld};
-use crate::Res;
 
 /// Compile a page (index, tag listing, or standalone page) to HTML.
 pub(crate) fn render_page(shared: &Shared, main_rel: &str, inputs: Option<Dict>) -> Res<String> {

@@ -4,18 +4,32 @@
 [![crates.io](https://img.shields.io/crates/v/papyr.svg)](https://crates.io/crates/papyr)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A minimal, self-contained static **blog engine** — write posts in
-[Typst](https://typst.app) (not Markdown), get a clean static site. papyr is a
-single Rust binary that links Typst as a library: it builds, serves, and
-watches, with no Node, no Python, and no separate `typst`/Caddy.
+**A minimal static blog engine powered by [Typst](https://typst.app).** Write
+posts in Typst instead of Markdown and get a fast, clean static site — out of a
+single self-contained binary.
 
-- Syntax-highlighted code and math rendered **at build time** (code →
-  inline-styled HTML, math → native MathML) — pages ship zero client-side JS.
-- Light theme with automatic dark mode; self-hosted fonts.
-- Posts, tags, an RSS feed, and standalone pages.
-- One in-process compile per file: the HTML *and* the post metadata come from
-  the same compiled document (via introspection) — no double-compile, no
-  shelling out.
+papyr links Typst in as a library and ships its own dev server and file watcher,
+so there's no external toolchain to wrangle: no Node, no Python, no separate
+Typst CLI, no static-server sidecar. Just `papyr`.
+
+- **Zero client-side JS.** Code is syntax-highlighted and math is rendered to
+  native MathML at build time — nothing ships to the browser but HTML and CSS.
+- **Live reload.** `papyr serve` rebuilds on save and refreshes the open page.
+- **Light + automatic dark mode**, with self-hosted fonts.
+- **Posts, tags, an RSS feed, and standalone pages** out of the box.
+- **One compile per file.** The HTML *and* the post's metadata come from the
+  same compiled document via introspection — no double-compile, no shelling out.
+
+## Quick start
+
+```sh
+cargo install papyr            # see Install for Nix / prebuilt binaries
+papyr init my-blog && cd my-blog
+papyr serve                    # http://localhost:8080, live-reloads on save
+```
+
+Edit a file under `posts/` and the page reloads itself. When you're happy,
+`papyr build` writes the static site to `./site/`.
 
 ## Install
 
@@ -51,7 +65,7 @@ While iterating, skip the slow optimized rebuild — `just install-fast` symlink
 the incrementally-built debug binary onto your PATH, so a plain `just build`
 (~1s) updates `papyr` live. Run `just install` for the optimized binary when done.
 
-## Use
+## Usage
 
 ```sh
 papyr init my-blog         # scaffold a new site

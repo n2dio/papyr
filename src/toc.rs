@@ -71,12 +71,12 @@ pub(crate) fn process(html: &str, toc: Toc) -> String {
     });
 
     let mut result = result.into_owned();
-    if let Some(open) = toc.enabled() {
-        if headings.len() >= 2 {
-            let toc_html = build_toc(&headings, open);
-            if let Some(pos) = toc_insert_pos(&result) {
-                result.insert_str(pos, &toc_html);
-            }
+    if let Some(open) = toc.enabled()
+        && headings.len() >= 2
+    {
+        let toc_html = build_toc(&headings, open);
+        if let Some(pos) = toc_insert_pos(&result) {
+            result.insert_str(pos, &toc_html);
         }
     }
     result
@@ -86,10 +86,10 @@ pub(crate) fn process(html: &str, toc: Toc) -> String {
 /// — not buried below the intro paragraph. Falls back to before the first
 /// heading if there's no post meta.
 fn toc_insert_pos(html: &str) -> Option<usize> {
-    if let Some(i) = html.find(r#"class="post-meta""#) {
-        if let Some(end) = html[i..].find("</p>") {
-            return Some(i + end + "</p>".len());
-        }
+    if let Some(i) = html.find(r#"class="post-meta""#)
+        && let Some(end) = html[i..].find("</p>")
+    {
+        return Some(i + end + "</p>".len());
     }
     html.find(r#"<h2 id=""#)
         .or_else(|| html.find(r#"<h3 id=""#))
