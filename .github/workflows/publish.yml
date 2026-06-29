@@ -1,0 +1,44 @@
+name: publish
+
+# Publishes the crate to crates.io when a v* tag is pushed (same trigger as
+# release.yml). Gated on the CRATES_IO_TOKEN repo secret: if it's not set, the
+# job no-ops with a message, so nothing publishes until the maintainer adds the
+# token and pushes a tag. Publishing is irreversible (you can only yank).
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: cargo publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Check for crates.io token
+        id: token
+        env:
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        run: |
+          if [ -z "$CRATES_IO_TOKEN" ]; then
+            echo "::notice::CRATES_IO_TOKEN is not set — skipping publish."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify packaging (dry run)
+        if: steps.token.outputs.present == 'true'
+        run: cargo publish --locked --dry-run
+
+      - name: Publish to crates.io
+        if: steps.token.outputs.present == 'true'
+        run: cargo publish --locked
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
