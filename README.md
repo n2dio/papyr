@@ -30,7 +30,7 @@ the incrementally-built debug binary onto your PATH, so a plain `just build`
 ```sh
 papyr init my-blog         # scaffold a new site
 cd my-blog
-papyr serve                # build, serve http://localhost:8080, rebuild on change
+papyr serve                # build, serve http://localhost:8080, rebuild + live-reload on change
 papyr new my-post          # scaffold posts/my-post.typ
 papyr build                # build the static site into ./site
 papyr build --strict       # ...and fail if any internal link is broken (CI)
