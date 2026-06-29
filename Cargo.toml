@@ -1,6 +1,6 @@
 [package]
 name = "papyr"
-version = "0.1.1"
+version = "0.1.3"
 edition = "2021"
 description = "A minimal, Typst-powered static blog generator"
 license = "MIT"
@@ -19,9 +19,9 @@ path = "src/main.rs"
 typst = "=0.15.0"
 typst-html = "=0.15.0"
 typst-kit = { version = "=0.15.0", features = [
-    "embedded-fonts",
-    "emit-diagnostics",
-    "system-packages",
+  "embedded-fonts",
+  "emit-diagnostics",
+  "system-packages",
 ] }
 comemo = "0.4"
 ecow = "0.2"
@@ -29,11 +29,19 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_yaml_ng = "0.10"
 regex = "1"
-chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+chrono = { version = "0.4", default-features = false, features = [
+  "clock",
+  "std",
+] }
 clap = { version = "4", features = ["derive"] }
 
 # serve + watch
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "sync"] }
+tokio = { version = "1", features = [
+  "rt-multi-thread",
+  "macros",
+  "net",
+  "sync",
+] }
 tokio-stream = { version = "0.1", features = ["sync"] }
 axum = "0.8"
 tower-http = { version = "0.7", features = ["fs", "trace"] }
