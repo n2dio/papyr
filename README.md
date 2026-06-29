@@ -1,5 +1,9 @@
 # papyr
 
+[![ci](https://github.com/n2dio/papyr/actions/workflows/ci.yml/badge.svg)](https://github.com/n2dio/papyr/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/papyr.svg)](https://crates.io/crates/papyr)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A minimal, self-contained static **blog engine** — write posts in
 [Typst](https://typst.app) (not Markdown), get a clean static site. papyr is a
 single Rust binary that links Typst as a library: it builds, serves, and
@@ -15,11 +19,33 @@ watches, with no Node, no Python, and no separate `typst`/Caddy.
 
 ## Install
 
+### Nix (flake)
+
 ```sh
-cargo install --path .     # optimized → ~/.cargo/bin/papyr   (or: just install)
+nix run github:n2dio/papyr -- init my-blog      # run without installing
+nix profile install github:n2dio/papyr          # install `papyr` into your profile
+```
+
+### Cargo
+
+```sh
+cargo install papyr                              # from crates.io
+cargo install --git https://github.com/n2dio/papyr   # latest from git
 ```
 
 Make sure `~/.cargo/bin` is on your `PATH`.
+
+### Prebuilt binaries
+
+Grab a tarball for your platform (Linux x86_64/aarch64 musl, macOS
+x86_64/aarch64) from the [latest release](https://github.com/n2dio/papyr/releases/latest),
+then extract `papyr` onto your `PATH`.
+
+### From source
+
+```sh
+cargo install --path .     # optimized → ~/.cargo/bin/papyr   (or: just install)
+```
 
 While iterating, skip the slow optimized rebuild — `just install-fast` symlinks
 the incrementally-built debug binary onto your PATH, so a plain `just build`
@@ -119,6 +145,10 @@ This repo is the engine. The embedded scaffold lives in `lib/`, `gen/`, and
 `assets/` (baked into the binary via `include_str!`/`include_bytes!`); the CLI
 and build logic are in `src/`.
 
+A dev shell with the full toolchain (cargo, rustc, rustfmt, clippy, just) is
+provided via Nix — `nix develop` (flake) or `nix-shell` (legacy). With `direnv`
+it loads automatically on `cd` (run `direnv allow` once).
+
 ```sh
 just build | release | install | install-fast | test | check | fmt | lint
 ```
@@ -130,4 +160,4 @@ time.
 
 ## License
 
-MIT OR Apache-2.0.
+[MIT](LICENSE) © Tim Eggert.

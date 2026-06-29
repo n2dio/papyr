@@ -3,6 +3,7 @@
 /target/
 /.scratch/
 /.direnv/
+/result
 .DS_Store
 
 # Claude Code machine-local settings
